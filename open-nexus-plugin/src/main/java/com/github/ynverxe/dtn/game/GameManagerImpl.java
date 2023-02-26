@@ -2,7 +2,8 @@ package com.github.ynverxe.dtn.game;
 
 import java.util.Collection;
 import java.util.Set;
-import com.github.ynverxe.util.ExceptionHandler;
+
+import com.github.ynverxe.dtn.exception.ExceptionCatcher;
 import com.github.ynverxe.dtn.environment.DTNEnvironment;
 import java.util.concurrent.CompletableFuture;
 import java.util.Objects;
@@ -168,7 +169,7 @@ public class GameManagerImpl implements GameManager {
     
     public CompletableFuture<Boolean> saveGameAsync(@NotNull String gameId) {
         return CompletableFuture.supplyAsync(() -> this.saveGame(gameId), DTNEnvironment.instance().STORAGE_EXECUTOR)
-                .exceptionally(new ExceptionHandler<>());
+                .exceptionally(ExceptionCatcher.asHandler());
     }
     
     public CompletableFuture<Void> saveAll(boolean async) {

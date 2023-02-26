@@ -1,6 +1,6 @@
 package com.github.ynverxe.dtn.scheduler;
 
-import com.github.ynverxe.util.ExceptionHandler;
+import com.github.ynverxe.dtn.exception.ExceptionCatcher;
 import java.util.function.Supplier;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.Bukkit;
@@ -49,7 +49,7 @@ public class BScheduler implements Scheduler {
     }
     
     public <T> CompletableFuture<T> supply(Supplier<T> supplier, int delay, boolean async) {
-        CompletableFuture<T> future = new CompletableFuture<T>().exceptionally(new ExceptionHandler<>());
+        CompletableFuture<T> future = new CompletableFuture<T>().exceptionally(ExceptionCatcher.asHandler());
         this.executeTask(() -> future.complete(supplier.get()), delay, async);
         return future;
     }

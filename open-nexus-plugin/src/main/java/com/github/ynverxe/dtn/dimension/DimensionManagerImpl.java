@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.Optional;
 
 import com.github.ynverxe.dtn.dimension.properties.PropertiesContainer;
+import com.github.ynverxe.dtn.exception.ExceptionCatcher;
 import com.github.ynverxe.dtn.operation.dimension.CreateDimensionOperation;
 import com.github.ynverxe.dtn.operation.dimension.LoadDimensionOperation;
 import com.github.ynverxe.dtn.operation.dimension.SaveDimensionOperation;
@@ -13,7 +14,6 @@ import com.github.ynverxe.dtn.world.WorldContainerImpl;
 import com.github.ynverxe.dtn.world.WorldHelper;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
-import com.github.ynverxe.util.ExceptionHandler;
 import com.github.ynverxe.dtn.environment.DTNEnvironment;
 import java.util.concurrent.CompletableFuture;
 import java.util.ArrayList;
@@ -113,7 +113,7 @@ public class DimensionManagerImpl implements DimensionManager {
     
     public CompletableFuture<Boolean> saveDimensionAsync(@NotNull String dimensionName) {
         return CompletableFuture.supplyAsync(() -> saveDimension(dimensionName), DTNEnvironment.instance().STORAGE_EXECUTOR)
-                .exceptionally(new ExceptionHandler<>());
+                .exceptionally(ExceptionCatcher.asHandler());
     }
     
     @NotNull
