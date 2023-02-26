@@ -24,4 +24,32 @@ public final class MetadataHelper {
 
         return metadataValues.get(0);
     }
+
+    public static MetadataValue filtering(Metadatable metadatable, String key, Class<?> expected) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("DestroyTheNexus");
+
+        List<MetadataValue> metadataValues = metadatable.getMetadata(key)
+                .stream()
+                .filter(value -> plugin.equals(value.getOwningPlugin()))
+                .filter(expected::isInstance)
+                .collect(Collectors.toList());
+
+        if (metadataValues.isEmpty()) return null;
+
+        return metadataValues.get(0);
+    }
+
+    public static <T> T filteringAndGet(Metadatable metadatable, String key, Class<T> expected) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("DestroyTheNexus");
+
+        List<MetadataValue> metadataValues = metadatable.getMetadata(key)
+                .stream()
+                .filter(value -> plugin.equals(value.getOwningPlugin()))
+                .filter(expected::isInstance)
+                .collect(Collectors.toList());
+
+        if (metadataValues.isEmpty()) return null;
+
+        return expected.cast(metadataValues.get(0).value());
+    }
 }

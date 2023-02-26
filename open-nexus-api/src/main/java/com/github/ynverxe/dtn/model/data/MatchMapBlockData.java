@@ -8,16 +8,14 @@ import com.github.ynverxe.dtn.model.instance.ImplicitlyDeserializable;
 import com.github.ynverxe.structured.data.ModelDataTree;
 import com.github.ynverxe.structured.data.ModelDataTreeImpl;
 import com.github.ynverxe.structured.data.ModelDataValue;
+import com.github.ynverxe.util.metadata.MetadataHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MatchMapBlockData implements DataTransferer<MatchMapBlockData>, ImplicitlyDeserializable, BackedModel {
 
@@ -73,22 +71,7 @@ public class MatchMapBlockData implements DataTransferer<MatchMapBlockData>, Imp
     }
 
     public static @Nullable <T extends MatchMapBlockData> T fromBlock(@NotNull Block block, @NotNull Class<T> clazz) {
-        List<MetadataValue> metadataValues = block.getMetadata("custom_block_data")
-                .stream()
-                .filter(metadataValue -> metadataValue.value() instanceof RegenerativeBlockData)
-                .collect(Collectors.toList());
-
-        if (metadataValues.isEmpty()) {
-            return null;
-        }
-
-        Object value = metadataValues.get(0).value();
-
-        if (!clazz.isInstance(value)) {
-            return null;
-        }
-
-        return clazz.cast(value);
+        return MetadataHelper.filteringAndGet(block, "custom_block_data", clazz);
     }
 
     public static @Nullable MatchMapBlockData fromBlock(@NotNull Block block) {
