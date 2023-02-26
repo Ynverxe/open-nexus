@@ -1,0 +1,29 @@
+lobby-board:
+  title: "&e&lDestroy The Nexus"
+  lines:
+    - "&8» &bWarrior: &e%player_name%"
+    - ""
+    - "&7awesomenetwork.net"
+waiting-game-board:
+  title: "&b&lDestroy The Nexus"
+  lines:
+    - "&8» &bWarrior: &e%player_name%"
+    - ""
+    - "&8» &fSelected team: %aplayer_team%"
+    - ""
+    - "&8» &ePlayers: &b%game_current%/%game_min%"
+    - "&8» &aStarting in: &b%game_timer%"
+    - ""
+    - "&7awesomenetwork.net"
+in-game-board:
+  title: "&a&lDestroy The Nexus"
+  lines:
+    - "&8» &bWarrior: &e%player_name%"
+    - ""
+    - "&8» &bTimer: %game_timer%"
+    - "%team_green% &ahealth: &c%team_green_health%"
+    - "%team_blue% &ahealth: &c%team_blue_health%"
+    - "%team_red% &ahealth: &c%team_red_health%"
+    - "%team_yellow% &ahealth: &c%team_yellow_health%"
+    - ""
+    - "&7awesomenetwork.net"
