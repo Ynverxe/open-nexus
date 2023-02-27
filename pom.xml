@@ -7,7 +7,7 @@
     <groupId>com.github.ynverxe</groupId>
     <artifactId>DestroyTheNexus</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-beta</version>
     <modules>
         <module>open-nexus-api</module>
         <module>open-nexus-plugin</module>
@@ -16,6 +16,9 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+
+        <project.api-version>1.0.0-beta</project.api-version>
+        <project.plugin-version>1.0.0-beta</project.plugin-version>
     </properties>
 
     <build>
