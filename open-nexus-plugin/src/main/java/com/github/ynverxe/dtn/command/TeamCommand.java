@@ -17,23 +17,26 @@ public class TeamCommand implements CommandClass {
             sender.renderResource(DefaultTranslationContainer.NOT_IN_A_GAME);
             return true;
         }
-        game.handleReadyPlayer(sender, color);
+
+        game.teamSelector().bindTeamToPlayer(sender, color);
         sender.renderResource(DefaultTranslationContainer.TEAM_JOIN.replacing("<team>", color.coloredName()));
         return true;
     }
     
     @Command(names = { "leave" })
     public boolean leaveTeam(@CSender final APlayer sender) {
-        final GameInstance game = sender.playingGame();
+        GameInstance game = sender.playingGame();
         if (game == null) {
             sender.renderResource(DefaultTranslationContainer.NOT_IN_A_GAME);
             return true;
         }
-        final TeamColor teamColor = game.removeReadyPlayer(sender);
+
+        TeamColor teamColor = game.teamSelector().discardPlayerSelection(sender);
         if (teamColor == null) {
             sender.renderResource(DefaultTranslationContainer.NOT_IN_A_TEAM);
             return true;
         }
+
         sender.renderResource(DefaultTranslationContainer.TEAM_LEAVE.replacing("<team>", teamColor.coloredName()));
         return true;
     }

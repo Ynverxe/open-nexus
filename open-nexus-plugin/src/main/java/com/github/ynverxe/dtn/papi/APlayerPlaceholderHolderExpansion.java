@@ -36,7 +36,7 @@ public class APlayerPlaceholderHolderExpansion extends PlaceholderExpansion {
             return null;
         }
 
-        TeamColor teamColor = gameInstance.findPlayerTeam(aPlayer);
+        TeamColor teamColor = gameInstance.teamSelector().getPlayerSelection(aPlayer);
         if (teamColor == null) {
             return null;
         }

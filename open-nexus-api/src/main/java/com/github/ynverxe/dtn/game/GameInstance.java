@@ -8,6 +8,7 @@ import com.github.ynverxe.dtn.model.instance.Terminable;
 import com.github.ynverxe.dtn.match.Match;
 import com.github.ynverxe.dtn.player.APlayer;
 import com.github.ynverxe.dtn.team.TeamColor;
+import com.github.ynverxe.dtn.team.TeamSelector;
 import com.github.ynverxe.util.Pair;
 import com.github.ynverxe.util.vote.VotingContext;
 import com.github.ynverxe.util.time.MillisSnapshot;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface GameInstance extends Named, Iterable<APlayer>, Terminable {
+
     @NotNull UUID id();
 
     @NotNull GameRoom room();
@@ -29,17 +31,13 @@ public interface GameInstance extends Named, Iterable<APlayer>, Terminable {
 
     @NotNull VotingContext<APlayer, String, Dimension> mapVotes();
 
-    @NotNull Map<TeamColor, List<APlayer>> readyPlayers();
+    @NotNull TeamSelector teamSelector();
 
     @NotNull MillisSnapshot temporizerSnapshot();
 
     int minPlayersPerTeam();
 
     int maxPlayersPerTeam();
-
-    void handleReadyPlayer(@NotNull APlayer player, @NotNull TeamColor team);
-
-    @Nullable TeamColor removeReadyPlayer(@NotNull APlayer p0);
 
     void joinPlayer(@NotNull APlayer p0);
 
@@ -53,7 +51,6 @@ public interface GameInstance extends Named, Iterable<APlayer>, Terminable {
 
     @NotNull Pair<Authorization, Match> startMatch(@NotNull Dimension p0) throws MatchInitializeException;
 
-    @Nullable TeamColor findPlayerTeam(@NotNull APlayer p0);
-
     @NotNull Rules rules();
+
 }

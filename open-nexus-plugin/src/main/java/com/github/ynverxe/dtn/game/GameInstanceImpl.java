@@ -1,6 +1,7 @@
 package com.github.ynverxe.dtn.game;
 
 import com.github.ynverxe.dtn.model.instance.AbstractTerminable;
+import com.github.ynverxe.dtn.team.TeamSelector;
 import com.github.ynverxe.util.RandomElementPicker;
 import com.github.ynverxe.dtn.event.match.MatchEndEvent;
 import com.github.ynverxe.dtn.game.expansion.FeatureHandler;
@@ -9,34 +10,28 @@ import com.github.ynverxe.translation.resource.ResourceReference;
 import com.github.ynverxe.dtn.translation.DefaultTranslationContainer;
 import com.github.ynverxe.dtn.authorization.Authorization;
 import com.github.ynverxe.util.Pair;
+
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import com.github.ynverxe.dtn.event.room.PlayerLeaveGameEvent;
 import com.github.ynverxe.dtn.player.APlayerImpl;
 import org.bukkit.Bukkit;
 import com.github.ynverxe.dtn.event.room.PlayerJoinGameEvent;
-import com.github.ynverxe.dtn.team.Team;
-import java.util.Iterator;
 import com.github.ynverxe.dtn.player.MatchPlayer;
-import java.util.Objects;
 import com.github.ynverxe.util.time.MillisSnapshot;
-import java.util.Collections;
 import org.jetbrains.annotations.Nullable;
 import com.github.ynverxe.dtn.match.Match;
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
 import com.github.ynverxe.dtn.DestroyTheNexus;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.HashMap;
+
 import com.github.ynverxe.util.time.Temporizer;
 import com.github.ynverxe.dtn.dimension.Dimension;
 import com.github.ynverxe.util.vote.VotingContext;
 import com.github.ynverxe.dtn.player.APlayer;
-import java.util.List;
 import com.github.ynverxe.dtn.team.TeamColor;
-import java.util.Map;
-import java.util.UUID;
 import com.github.ynverxe.translation.Messenger;
 
 public class GameInstanceImpl extends AbstractTerminable implements GameInstance {
@@ -44,10 +39,10 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
     private final Messenger messenger;
     private final String name;
     private final UUID id;
-    private final Map<TeamColor, List<APlayer>> readyPlayers;
     private final GameRoomImpl room;
     private final Rules rules;
     private final VotingContext<APlayer, String, Dimension> mapVotes;
+    private final TeamSelector teamSelector;
     private final Temporizer temporizerToStart;
     private final Temporizer temporizerToEnd;
     private final List<APlayer> players;
@@ -57,7 +52,6 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
     
     GameInstanceImpl(GameRoomImpl room) {
         this.id = UUID.randomUUID();
-        this.readyPlayers = new HashMap<>();
         this.players = new CopyOnWriteArrayList<>();
         this.room = room;
         this.rules = room.rules();
@@ -68,10 +62,8 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         this.temporizerToStart = new Temporizer(this::startMatch, room.rules().secondsToStart(), TimeUnit.SECONDS);
         this.temporizerToEnd = new Temporizer(this::terminate, room.rules().secondsToEndMatch(), TimeUnit.SECONDS);
         this.mapVotes = VotingContext.createContext(room.expansion()::findMapCandidates);
+        this.teamSelector = new GameTeamSelectorImpl(this);
         this.messenger = DestroyTheNexus.instance().messenger();
-        for (TeamColor value : TeamColor.values()) {
-            this.readyPlayers.put(value, new ArrayList<>());
-        }
     }
     
     @NotNull
@@ -118,13 +110,13 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         this.checkNotTerminated();
         return this.mapVotes;
     }
-    
-    @NotNull
-    public Map<TeamColor, List<APlayer>> readyPlayers() {
+
+    @Override
+    public @NotNull TeamSelector teamSelector() {
         this.checkNotTerminated();
-        return Collections.unmodifiableMap(this.readyPlayers);
+        return teamSelector;
     }
-    
+
     private Temporizer runningInstanceTemporizer() {
         this.checkNotTerminated();
         switch (this.state()) {
@@ -160,41 +152,6 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         return this.maxPlayersPerTeam;
     }
     
-    public void handleReadyPlayer(@NotNull APlayer aPlayer, @NotNull TeamColor teamColor) {
-        this.checkNotTerminated();
-
-        if (this.match != null) {
-            this.match.addPlayer(aPlayer, teamColor);
-        } else {
-            this.readyPlayers.get(Objects.requireNonNull(teamColor, "teamColor")).add(Objects.requireNonNull(aPlayer, "anniPlayer"));
-        }
-    }
-    
-    @Nullable
-    public TeamColor removeReadyPlayer(@NotNull APlayer aPlayer) {
-        if (!this.readyPlayers.isEmpty()) {
-            for (Map.Entry<TeamColor, List<APlayer>> entry : this.readyPlayers.entrySet()) {
-                if (entry.getValue().remove(aPlayer)) {
-                    return entry.getKey();
-                }
-            }
-            return null;
-        }
-
-        MatchPlayer matchPlayer = this.match.players().get(aPlayer.uuid());
-        if (matchPlayer == null) {
-            throw new IllegalArgumentException(aPlayer.name() + " doesn't belongs to this game instance.");
-        }
-
-        Team team = matchPlayer.team();
-        if (team == null) {
-            return null;
-        }
-
-        matchPlayer.leaveTeam();
-        return team.color();
-    }
-    
     public void joinPlayer(@NotNull APlayer aPlayer) {
         if (this.isPlayerInGame(aPlayer)) {
             throw new IllegalArgumentException("Player '" + aPlayer.name() + "' is already in this room");
@@ -223,9 +180,7 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
 
         PlayerLeaveGameEvent event = new PlayerLeaveGameEvent(aPlayer, this);
         Bukkit.getPluginManager().callEvent(event);
-        if (!this.readyPlayers.isEmpty()) {
-            this.removeReadyPlayer(aPlayer);
-        }
+        teamSelector.discardPlayerSelection(aPlayer);
 
         this.players.remove(aPlayer);
         ((APlayerImpl)aPlayer).handleRoomLeave();
@@ -300,9 +255,10 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
 
         if (this.rules.disableTeamSelection() && this.rules.enableRandomTeamJoin()) {
             this.players.forEach(player -> {
-                if (this.findPlayerTeam(player) != null) return;
+                if (teamSelector.getPlayerSelection(player) != null) return;
 
-                this.joinRandomTeam(player);
+                TeamColor team = findRandomTeamForPlayer(player, players.size(), teamSelector.collectAllSelections());
+                teamSelector.bindTeamToPlayer(player, team);
             });
         }
 
@@ -310,25 +266,6 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         this.handleMatchStart();
 
         return new Pair<>(authorization, this.match);
-    }
-
-    public @Nullable TeamColor findPlayerTeam(@NotNull APlayer aPlayer) {
-        if (!this.equals(aPlayer.playingGame())) {
-            throw new IllegalArgumentException("Player is not playing in this instance");
-        }
-
-        if (this.match != null) {
-            return aPlayer.toMatchRepresent().map(MatchPlayer::team).map(Team::color).orElse(null);
-        }
-
-        for (Map.Entry<TeamColor, List<APlayer>> entry : this.readyPlayers.entrySet()) {
-            List<APlayer> players = entry.getValue();
-            if (players.contains(aPlayer)) {
-                return entry.getKey();
-            }
-        }
-
-        return null;
     }
     
     @NotNull
@@ -346,8 +283,7 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
     }
     
     private void handleMatchStart() {
-        this.readyPlayers.forEach((color, players) -> players.forEach(player -> this.match.addPlayer(player, color)));
-        this.readyPlayers.clear();
+        this.teamSelector.collectAllSelections().forEach((color, players) -> players.forEach(player -> this.match.joinPlayer(player, color)));
     }
     
     @NotNull
@@ -380,7 +316,7 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         if (this.rules().enableRandomTeamJoin()) {
             aptToStart = (this.players.size() >= this.rules().minPlayersPerTeam() * 4);
         } else {
-            for (List<APlayer> value : this.readyPlayers.values()) {
+            for (List<APlayer> value : this.teamSelector.collectAllSelections().values()) {
                 int onlineTeamPlayers = value.size();
 
                 if (onlineTeamPlayers < this.minPlayersPerTeam) {
@@ -404,34 +340,8 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         }
 
         if (message != null) {
-            this.messenger.dispatchResource(this.readyPlayers.values(), message);
+            this.messenger.dispatchResource(this.players, message);
         }
-    }
-    
-    private void joinRandomTeam(APlayer player) {
-        List<TeamColor> teamsToJoin = unbalancedTeams(this.players.size(), this.readyPlayers);
-        if (teamsToJoin.isEmpty()) {
-            teamsToJoin.addAll(this.readyPlayers.keySet());
-        }
-
-        TeamColor team = RandomElementPicker.pickRandom(teamsToJoin);
-
-        //noinspection ConstantConditions
-        this.handleReadyPlayer(player, team);
-    }
-    
-    private static List<TeamColor> unbalancedTeams(int gamePlayers, Map<TeamColor, ? extends List<?>> teams) {
-        List<TeamColor> unbalancedTeams = new ArrayList<>();
-        int balance = gamePlayers / 4;
-
-        teams.forEach((team, players) -> {
-            int teamPlayerCount = players.size();
-            if (teamPlayerCount < balance) {
-                unbalancedTeams.add(team);
-            }
-        });
-
-        return unbalancedTeams;
     }
 
     private void createMatch(GameExpansion expansion, Dimension dimension) {
@@ -443,5 +353,52 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
         if (this.temporizerToStart.isStarted()) {
             this.temporizerToStart.restart();
         }
+    }
+
+    void handleTeamSelection(APlayer player, TeamColor selected) {
+        if (match == null) return;
+
+        MatchPlayer matchPlayer = player.toMatchRepresent().orElse(null);
+
+        if (matchPlayer == null) {
+            match.joinPlayer(player, selected);
+        } else {
+            matchPlayer.joinTeam(selected);
+        }
+    }
+
+    void handleSelectionDiscard(APlayer player, TeamColor discard) {
+        if (match == null) return;
+
+        player.toMatchRepresent().ifPresent(MatchPlayer::leaveTeam);
+    }
+
+    void checkNotExternal(APlayer player) {
+        if (!players.contains(player)) throw new IllegalArgumentException("player doesn't belong to this game");
+    }
+
+    private static TeamColor findRandomTeamForPlayer(APlayer player, int totalPlayers, Map<TeamColor, ? extends List<?>> teams) {
+        List<TeamColor> teamsToJoin = unbalancedTeams(totalPlayers, teams);
+        if (teamsToJoin.isEmpty()) {
+            teamsToJoin.addAll(Arrays.asList(TeamColor.values()));
+        }
+
+        return RandomElementPicker.pickRandom(teamsToJoin);
+    }
+    
+    private static List<TeamColor> unbalancedTeams(int gamePlayers, Map<TeamColor, ? extends List<?>> teams) {
+        List<TeamColor> unbalancedTeams = new ArrayList<>();
+        int balance = gamePlayers / 4;
+        System.out.println(balance);
+
+        teams.forEach((team, players) -> {
+            int teamPlayerCount = players.size();
+
+            if (teamPlayerCount < balance) {
+                unbalancedTeams.add(team);
+            }
+        });
+
+        return unbalancedTeams;
     }
 }

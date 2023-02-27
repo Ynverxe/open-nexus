@@ -40,7 +40,7 @@ public interface Match extends Named, Terminable {
 
     @NotNull MatchMap runningMap();
 
-    @NotNull MatchPlayer addPlayer(@NotNull APlayer p0, @NotNull TeamColor p1);
+    @NotNull MatchPlayer joinPlayer(@NotNull APlayer p0, @NotNull TeamColor p1);
 
     void preparePlayer(MatchPlayer p0, boolean p1);
 

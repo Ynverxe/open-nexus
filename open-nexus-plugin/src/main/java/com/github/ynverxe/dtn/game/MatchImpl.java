@@ -139,7 +139,7 @@ public class MatchImpl extends AbstractTerminable implements Match {
     }
     
     @NotNull
-    public MatchPlayer addPlayer(@NotNull APlayer aPlayer, @NotNull TeamColor teamColor) {
+    public MatchPlayer joinPlayer(@NotNull APlayer aPlayer, @NotNull TeamColor teamColor) {
         this.checkNotTerminated();
         if (this.players.containsKey(aPlayer.uuid())) {
             return this.players.get(aPlayer.uuid());
