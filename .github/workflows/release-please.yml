@@ -9,6 +9,7 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: true
           release-type: maven
           package-name: dtn-rp
