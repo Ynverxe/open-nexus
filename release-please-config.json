@@ -1,0 +1,12 @@
+{
+  "release-type": "maven",
+  "prerelease": true,
+  "packages": {
+    "open-nexus-api": {
+      "release-as": "0.1.0"
+    },
+    "open-nexus-plugin": {
+      "release-as": "0.1.0"
+    }
+  }
+}
