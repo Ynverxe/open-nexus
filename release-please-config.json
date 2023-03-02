@@ -2,6 +2,11 @@
   "release-type": "maven",
   "prerelease": true,
   "package": {
-    ".": {}
+    "open-nexus-api": {
+      "package-name": "dtn-api"
+    },
+    "open-nexus-plugin": {
+      "package-name": "dtn-plugin"
+    }
   }
 }
