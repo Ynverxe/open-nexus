@@ -27,3 +27,4 @@ in-game-board:
     - "%team_yellow% &ahealth: &c%team_yellow_health%"
     - ""
     - "&7awesomenetwork.net"
+path: "yes"
