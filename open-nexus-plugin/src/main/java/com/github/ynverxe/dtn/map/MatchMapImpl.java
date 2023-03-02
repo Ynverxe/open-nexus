@@ -59,6 +59,8 @@ public class MatchMapImpl extends AbstractTerminable implements MatchMap {
         this.runnables.addRunnable(new NexusThrobbingEffectRender(match), false);
         this.runnables.addRunnable(this.blockRegenerator, true);
         TickableRegistry.instance().registerNewTickableEntity(this);
+
+        System.out.println(teamSpawns);
     }
     
     @NotNull

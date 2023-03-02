@@ -31,7 +31,7 @@ public final class MetadataHelper {
         List<MetadataValue> metadataValues = metadatable.getMetadata(key)
                 .stream()
                 .filter(value -> plugin.equals(value.getOwningPlugin()))
-                .filter(metadata -> expected.isInstance(metadata.value()))
+                .filter(expected::isInstance)
                 .collect(Collectors.toList());
 
         if (metadataValues.isEmpty()) return null;
@@ -40,10 +40,16 @@ public final class MetadataHelper {
     }
 
     public static <T> T filteringAndGet(Metadatable metadatable, String key, Class<T> expected) {
-        MetadataValue found = filtering(metadatable, key, expected);
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("DestroyTheNexus");
 
-        if (found == null) return null;
+        List<MetadataValue> metadataValues = metadatable.getMetadata(key)
+                .stream()
+                .filter(value -> plugin.equals(value.getOwningPlugin()))
+                .filter(expected::isInstance)
+                .collect(Collectors.toList());
 
-        return expected.cast(found.value());
+        if (metadataValues.isEmpty()) return null;
+
+        return expected.cast(metadataValues.get(0).value());
     }
 }
