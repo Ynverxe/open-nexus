@@ -3,6 +3,8 @@
   "prerelease": true,
   "separate-pull-requests": true,
   "packages": {
+    ".": {
+    },
     "open-nexus-api": {
       "package-name": "dtn-api"
     },
