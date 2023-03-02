@@ -3,10 +3,12 @@
   "prerelease": true,
   "packages": {
     "open-nexus-api": {
-      "release-as": "dtn-api-0.1.0"
+      "package-name": "dtn-api",
+      "release-as": "0.1.0"
     },
     "open-nexus-plugin": {
-      "release-as": "dtn-plugin-0.1.0"
+      "package-name": "dtn-plugin",
+      "release-as": "0.1.0"
     }
   }
 }
