@@ -1,0 +1,15 @@
+{
+  "release-type": "maven",
+  "prerelease": true,
+  "separate-pull-requests": true,
+  "packages": {
+    ".": {
+    },
+    "open-nexus-api": {
+      "package-name": "dtn-api"
+    },
+    "open-nexus-plugin": {
+      "package-name": "dtn-plugin"
+    }
+  }
+}

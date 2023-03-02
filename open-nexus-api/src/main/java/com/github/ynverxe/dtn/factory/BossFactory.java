@@ -5,6 +5,7 @@ import com.github.ynverxe.dtn.boss.PreparedBoss;
 import com.github.ynverxe.dtn.exception.ValueParseException;
 import com.github.ynverxe.dtn.match.Match;
 import com.github.ynverxe.dtn.model.data.BossModel;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -45,6 +46,12 @@ public final class BossFactory {
             );
 
             World world = location.getWorld();
+
+            if (world.getDifficulty() == Difficulty.PEACEFUL) {
+                // some entities like Wither cannot spawn on PEACEFUL difficulty
+                world.setDifficulty(Difficulty.EASY);
+            }
+
             LivingEntity livingEntity = (LivingEntity) world.spawnEntity(location, finalEntityType);
 
             livingEntity.setCustomName(bossModel.displayName());
