@@ -3,7 +3,7 @@
     <parent>
         <artifactId>DestroyTheNexus</artifactId>
         <groupId>com.github.ynverxe</groupId>
-        <version>1.0.0-beta</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>

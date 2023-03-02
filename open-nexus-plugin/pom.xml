@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.ynverxe</groupId>
         <artifactId>DestroyTheNexus</artifactId>
-        <version>1.0.0-beta</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>open-nexus-plugin</artifactId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.ynverxe</groupId>
             <artifactId>open-nexus-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
