@@ -62,6 +62,8 @@ public class YamlSourceCreator extends AbstractFileDataSourceFactory {
                     found = ((ConfigurationSerializable)found).serialize();
                 }
 
+                if (found == null) return null;
+
                 return ModelDataValue.ensureSafety(found);
             }
         };
