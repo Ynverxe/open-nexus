@@ -22,7 +22,7 @@ public final class StringFormatter {
             if (value instanceof ResourceReference) {
                 ResourceReference resourceReference = (ResourceReference) value;
 
-                if (resourceReference.type() == String.class) {
+                if (resourceReference.typeDescriptor().type() == String.class) {
                     ResourceMapper resourceMapper = context.getResourceMapper();
 
                     if (resourceMapper != null) {
