@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractResourceReference<T> implements ResourceReference<T> {
+public final class ResourceReferenceImpl<T> implements ResourceReference<T> {
 
-    protected final FormattingScheme formattingScheme;
-    protected final String path;
-    protected final char pathSeparator;
-    protected final Class<T> type;
-    protected final String dispatchMode;
-    protected final Supplier<Object> defaultValueSupplier;
+    private final FormattingScheme formattingScheme;
+    private final String path;
+    private final char pathSeparator;
+    private final ResourceTypeDescriptor typeDescriptor;
+    private final String dispatchMode;
+    private final Supplier<Object> defaultValueSupplier;
 
-    AbstractResourceReference(FormattingScheme formattingScheme, String path, char pathSeparator, Class<T> type, String dispatchMode, Supplier<Object> defaultValueSupplier) {
+    ResourceReferenceImpl(FormattingScheme formattingScheme, String path, char pathSeparator, ResourceTypeDescriptor typeDescriptor, String dispatchMode, Supplier<Object> defaultValueSupplier) {
         this.formattingScheme = formattingScheme;
         this.path = path;
         this.pathSeparator = pathSeparator;
-        this.type = type;
+        this.typeDescriptor = typeDescriptor;
         this.dispatchMode = dispatchMode;
         this.defaultValueSupplier = defaultValueSupplier;
     }
@@ -30,11 +30,6 @@ public abstract class AbstractResourceReference<T> implements ResourceReference<
     @NotNull @Override
     public FormattingScheme formattingScheme() {
         return formattingScheme;
-    }
-
-    @NotNull @Override
-    public Class<T> type() {
-        return type;
     }
 
     @NotNull @Override
@@ -53,6 +48,11 @@ public abstract class AbstractResourceReference<T> implements ResourceReference<
     }
 
     @Override
+    public @NotNull ResourceTypeDescriptor typeDescriptor() {
+        return typeDescriptor;
+    }
+
+    @Override
     public @Nullable List<T> defaultValue() {
         Object value = defaultValueSupplier.get();
         if (value instanceof List) {
@@ -68,28 +68,26 @@ public abstract class AbstractResourceReference<T> implements ResourceReference<
 
     @NotNull @Override
     public ResourceReference<T> withFormattingScheme(@NotNull FormattingScheme formattingScheme) {
-        return newReferenceImpl(formattingScheme, path, pathSeparator, type, dispatchMode, defaultValueSupplier);
+        return new ResourceReferenceImpl<>(formattingScheme, path, pathSeparator, typeDescriptor, dispatchMode, defaultValueSupplier);
     }
 
     @NotNull @Override
     public ResourceReference<T> withDefaultProvider(@NotNull Supplier<Object> defaultProvider) {
-        return newReferenceImpl(formattingScheme, path, pathSeparator, type, dispatchMode, defaultProvider);
+        return new ResourceReferenceImpl<>(formattingScheme, path, pathSeparator, typeDescriptor, dispatchMode, defaultProvider);
     }
 
     @NotNull @Override
     public ResourceReference<T> withPath(@NotNull String path) {
-        return newReferenceImpl(formattingScheme, path, pathSeparator, type, dispatchMode, defaultValueSupplier);
+        return new ResourceReferenceImpl<>(formattingScheme, path, pathSeparator, typeDescriptor, dispatchMode, defaultValueSupplier);
     }
 
     @NotNull @Override
     public ResourceReference<T> withSeparator(char separator) {
-        return newReferenceImpl(formattingScheme, path, separator, type, dispatchMode, defaultValueSupplier);
+        return new ResourceReferenceImpl<>(formattingScheme, path, separator, typeDescriptor, dispatchMode, defaultValueSupplier);
     }
 
     @NotNull @Override
     public ResourceReference<T> withDispatchMode(@NotNull String dispatchMode) {
-        return newReferenceImpl(formattingScheme, path, pathSeparator, type, dispatchMode, defaultValueSupplier);
+        return new ResourceReferenceImpl<>(formattingScheme, path, pathSeparator, typeDescriptor, dispatchMode, defaultValueSupplier);
     }
-
-    abstract ResourceReference<T> newReferenceImpl(FormattingScheme p0, String p1, char p2, Class<T> p3, String p4, Supplier<Object> p5);
 }
