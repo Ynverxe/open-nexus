@@ -13,32 +13,29 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public interface ResourceReference<T> {
 
-    static @NotNull <T> ResourceReference<T> create(@NotNull Class<T> type, @NotNull String path) {
-        return new TypedResourceReference<>(new FormattingScheme(), path, '.', type, "default", () -> null);
-    }
+    char DEFAULT_PATH_SEPARATOR = '.';
 
-    static @NotNull <T> ResourceReference<T> create(@NotNull Class<T> type, @NotNull Supplier<Object> defaultValueSupplier) {
-        return create(type, "").withDefaultProvider(defaultValueSupplier);
-    }
+    @NotNull FormattingScheme formattingScheme();
 
-    static @NotNull <T> ResourceReference<T> simple(@NotNull T value) {
-        return create((Class<T>) value.getClass(), () -> value);
-    }
+    @NotNull String renderMode();
 
-    static @NotNull <T> ResourceReference<T> resolve(Object value) {
-        if (value instanceof ResourceReference) {
-            return (ResourceReference<T>) value;
-        }
-        return (ResourceReference<T>) simple(value);
-    }
+    @NotNull String path();
 
-    static @NotNull AbstractResourceReference<?> onlyPath(@NotNull String typeName, @NotNull String path, char pathSeparator) {
-        return new AbstractTypedResourceReference(new FormattingScheme(), path, pathSeparator, "default", () -> null, typeName);
-    }
+    char pathSeparator();
 
-    static @NotNull AbstractResourceReference<?> onlyPath(@NotNull String typeName, @NotNull String path) {
-        return onlyPath(typeName, path, '.');
-    }
+    @Nullable List<T> defaultValue();
+
+    @NotNull ResourceTypeDescriptor typeDescriptor();
+
+    @NotNull ResourceReference<T> withFormattingScheme(@NotNull FormattingScheme p0);
+
+    @NotNull ResourceReference<T> withDefaultProvider(@NotNull Supplier<Object> p0);
+
+    @NotNull ResourceReference<T> withPath(@NotNull String p0);
+
+    @NotNull ResourceReference<T> withSeparator(char separator);
+
+    @NotNull ResourceReference<T> withDispatchMode(@NotNull String p0);
 
     default @NotNull Optional<List<T>> optionalDefaultValue() {
         return Optional.ofNullable(defaultValue());
@@ -61,33 +58,48 @@ public interface ResourceReference<T> {
         return withDefaultProvider(() -> def);
     }
 
-    default boolean isAbstract() {
-        return this instanceof AbstractTypedResourceReference;
+    static @NotNull <T> ResourceReference<T> create(@NotNull Class<T> type, @NotNull String path, char pathSeparator) {
+        return new ResourceReferenceImpl<>(
+                new FormattingScheme(),
+                path,
+                pathSeparator,
+                new ResourceTypeDescriptor("", type),
+                "default",
+                () -> null
+        );
     }
 
-    @NotNull FormattingScheme formattingScheme();
-
-    @NotNull Class<T> type();
-
-    @NotNull String renderMode();
-
-    @NotNull String path();
-
-    char pathSeparator();
-
-    @Nullable List<T> defaultValue();
-
-    default @NotNull ResourceOptions createOptions() {
-        return new ResourceOptions(null, type());
+    static @NotNull <T> ResourceReference<T> create(@NotNull Class<T> type, @NotNull String path) {
+        return create(type, path, DEFAULT_PATH_SEPARATOR);
     }
 
-    @NotNull ResourceReference<T> withFormattingScheme(@NotNull FormattingScheme p0);
+    static @NotNull ResourceReferenceImpl<?> create(@NotNull String typeName, @NotNull String path, char pathSeparator) {
+        return new ResourceReferenceImpl<>(
+                new FormattingScheme(),
+                path,
+                pathSeparator,
+                new ResourceTypeDescriptor(typeName, Object.class),
+                "default",
+                () -> null
+        );
+    }
 
-    @NotNull ResourceReference<T> withDefaultProvider(@NotNull Supplier<Object> p0);
+    static @NotNull ResourceReferenceImpl<?> create(@NotNull String typeName, @NotNull String path) {
+        return create(typeName, path, DEFAULT_PATH_SEPARATOR);
+    }
 
-    @NotNull ResourceReference<T> withPath(@NotNull String p0);
+    static @NotNull <T> ResourceReference<T> createWithAuxiliary(@NotNull Class<T> type, @NotNull Supplier<Object> defaultValueSupplier) {
+        return create(type, "").withDefaultProvider(defaultValueSupplier);
+    }
 
-    @NotNull ResourceReference<T> withSeparator(char p0);
+    static @NotNull <T> ResourceReference<T> createWithAuxiliary(@NotNull T value) {
+        return createWithAuxiliary((Class<T>) value.getClass(), () -> value);
+    }
 
-    @NotNull ResourceReference<T> withDispatchMode(@NotNull String p0);
+    static @NotNull <T> ResourceReference<T> resolve(Object value) {
+        if (value instanceof ResourceReference) {
+            return (ResourceReference<T>) value;
+        }
+        return (ResourceReference<T>) createWithAuxiliary(value);
+    }
 }
