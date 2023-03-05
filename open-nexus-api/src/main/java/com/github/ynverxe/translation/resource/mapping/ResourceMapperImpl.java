@@ -3,7 +3,7 @@ package com.github.ynverxe.translation.resource.mapping;
 import com.github.ynverxe.structured.data.ModelDataList;
 import com.github.ynverxe.structured.data.ModelDataValue;
 import com.github.ynverxe.translation.data.TranslationDataProvider;
-import com.github.ynverxe.translation.resource.ResourceOptions;
+import com.github.ynverxe.translation.resource.ResourceTypeDescriptor;
 import com.github.ynverxe.translation.resource.ResourceReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,37 +51,18 @@ public class ResourceMapperImpl implements ResourceMapper {
     @NotNull @Override
     public <T> List<T> formatData(
             @NotNull ModelDataValue dataValue,
-            @NotNull ResourceOptions resourceOptions,
+            @NotNull ResourceTypeDescriptor resourceTypeDescriptor,
             @NotNull FormattingScheme formattingScheme,
             @NotNull FormattingContext context
     ) {
-        Class resourceClass = resourceOptions.type();
-
-        if (Object.class.equals(resourceClass)) {
-            String typeName = resourceOptions.typeName();
-
-            if (dataValue.isTree()) {
-                typeName = dataValue.asTree().safeGet("$typeName")
-                        .map(ModelDataValue::asString)
-                        .orElse(typeName);
-            }
-
-            if (typeName.isEmpty()) {
-                throw new IllegalArgumentException("Abstract resource data doesn't has type name");
-            }
-
-            resourceClass = classTypeNames.get(typeName);
-            if (resourceClass == null) {
-                throw new IllegalArgumentException("Unknown class type name: '" + typeName + "'");
-            }
-        }
+        Class<?> resourceClass = consumeTypeDescriptor(dataValue, resourceTypeDescriptor);
 
         ResourceInterpreter resourceInterpreter = interpreterMap.get(resourceClass);
         if (resourceInterpreter == null) {
             throw new IllegalArgumentException("No resource interpreter found for: " + resourceClass);
         }
 
-        Object value =  resourceInterpreter.buildResource(
+        Object value = resourceInterpreter.buildResource(
                 dataValue,
                 formattingScheme,
                 context,
@@ -92,7 +73,15 @@ public class ResourceMapperImpl implements ResourceMapper {
             throw new IllegalArgumentException("Unable to build resource as: " + resourceClass);
         }
 
-        return (List<T>) ((value instanceof List) ? ((List) value) : Collections.singletonList(value));
+        List<T> list = new ArrayList<>();
+
+        if (value instanceof List) {
+            list.addAll((List<T>) value);
+        } else {
+            list.add((T) value);
+        }
+
+        return list;
     }
 
     @NotNull @Override
@@ -107,7 +96,8 @@ public class ResourceMapperImpl implements ResourceMapper {
 
         ModelDataList data = translationDataProvider.findTranslationData(sourceName, path, pathSeparator);
 
-        ResourceOptions options = resourceReference.createOptions();
+        ResourceTypeDescriptor options = resourceReference.typeDescriptor();
+
         if (data != null && !data.isEmpty()) {
             List<T> results = new ArrayList<>();
             int i = 0;
@@ -184,5 +174,30 @@ public class ResourceMapperImpl implements ResourceMapper {
             return (T) formatStrings(Collections.singletonList((String) value), scheme, context).get(0);
         }
         return value;
+    }
+
+    private Class<?> consumeTypeDescriptor(ModelDataValue dataValue, ResourceTypeDescriptor typeDescriptor) {
+        Class resourceClass = typeDescriptor.type();
+
+        if (Object.class.equals(resourceClass)) {
+            String typeName = typeDescriptor.typeName();
+
+            if (dataValue.isTree()) {
+                typeName = dataValue.asTree().safeGet("$typeName")
+                        .map(ModelDataValue::asString)
+                        .orElse(typeName);
+            }
+
+            if (typeName.isEmpty()) {
+                throw new IllegalArgumentException("Abstract resource data doesn't has type name");
+            }
+
+            resourceClass = classTypeNames.get(typeName);
+            if (resourceClass == null) {
+                throw new IllegalArgumentException("Unknown class type name: '" + typeName + "'");
+            }
+        }
+
+        return resourceClass;
     }
 }
