@@ -1,12 +1,12 @@
 package com.github.ynverxe.translation.resource.mapping;
 
+import com.github.ynverxe.structured.data.ModelDataValue;
 import com.github.ynverxe.translation.data.TranslationDataProvider;
 import com.github.ynverxe.translation.resource.ResourceOptions;
 import com.github.ynverxe.translation.resource.ResourceReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ResourceMapper {
 
@@ -21,7 +21,7 @@ public interface ResourceMapper {
     );
 
     @NotNull <T> List<T> formatData(
-            @NotNull Map<String, Object> data,
+            @NotNull ModelDataValue dataValue,
             @NotNull ResourceOptions resourceOptions,
             @NotNull FormattingScheme formattingScheme,
             @NotNull FormattingContext formattingContext

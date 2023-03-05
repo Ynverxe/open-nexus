@@ -1,10 +1,14 @@
 package com.github.ynverxe.translation.resource.mapping;
 
+import com.github.ynverxe.structured.data.ModelDataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-
 public interface ResourceInterpreter {
-    @Nullable Object buildResource(@NotNull Map<String, Object> p0, @NotNull FormattingScheme p1, @NotNull FormattingContext p2, @NotNull ResourceMapper p3);
+    @Nullable Object buildResource(
+            @NotNull ModelDataValue value,
+            @NotNull FormattingScheme formattingScheme,
+            @NotNull FormattingContext formattingContext,
+            @NotNull ResourceMapper resourceMapper
+    );
 }

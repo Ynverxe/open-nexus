@@ -1,10 +1,12 @@
 package com.github.ynverxe.translation.data;
 
+import com.github.ynverxe.structured.data.ModelDataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface DataSource {
-    @Nullable Object findData(@NotNull String[] p0, char p1);
+
+    @Nullable ModelDataValue findData(@NotNull String[] path, char separatorChar);
 
     default @NotNull String buildPath(@NotNull String[] path, char separatorChar) {
         StringBuilder builder = new StringBuilder();

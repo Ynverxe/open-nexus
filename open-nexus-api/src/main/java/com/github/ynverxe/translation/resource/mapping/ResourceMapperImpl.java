@@ -1,5 +1,7 @@
 package com.github.ynverxe.translation.resource.mapping;
 
+import com.github.ynverxe.structured.data.ModelDataList;
+import com.github.ynverxe.structured.data.ModelDataValue;
 import com.github.ynverxe.translation.data.TranslationDataProvider;
 import com.github.ynverxe.translation.resource.ResourceOptions;
 import com.github.ynverxe.translation.resource.ResourceReference;
@@ -34,6 +36,7 @@ public class ResourceMapperImpl implements ResourceMapper {
     ) {
         formattingContext.setResourceMapper(this);
         List<String> formatted = new ArrayList<>(strings.size());
+
         for (String string : strings) {
             for (StringInterceptor stringInterceptor : stringInterceptors) {
                 string = stringInterceptor.intercept(string, formattingScheme, formattingContext);
@@ -47,33 +50,46 @@ public class ResourceMapperImpl implements ResourceMapper {
 
     @NotNull @Override
     public <T> List<T> formatData(
-            @NotNull Map<String, Object> data,
+            @NotNull ModelDataValue dataValue,
             @NotNull ResourceOptions resourceOptions,
             @NotNull FormattingScheme formattingScheme,
             @NotNull FormattingContext context
     ) {
-        Class finalClass = resourceOptions.type();
+        Class resourceClass = resourceOptions.type();
 
-        if (Object.class.equals(finalClass)) {
-            String typeName = (String) data.getOrDefault("$typeName", resourceOptions.typeName());
-            if (typeName == null) {
+        if (Object.class.equals(resourceClass)) {
+            String typeName = resourceOptions.typeName();
+
+            if (dataValue.isTree()) {
+                typeName = dataValue.asTree().safeGet("$typeName")
+                        .map(ModelDataValue::asString)
+                        .orElse(typeName);
+            }
+
+            if (typeName.isEmpty()) {
                 throw new IllegalArgumentException("Abstract resource data doesn't has type name");
             }
 
-            finalClass = classTypeNames.get(typeName);
-            if (finalClass == null) {
+            resourceClass = classTypeNames.get(typeName);
+            if (resourceClass == null) {
                 throw new IllegalArgumentException("Unknown class type name: '" + typeName + "'");
             }
         }
 
-        ResourceInterpreter resourceInterpreter = interpreterMap.get(finalClass);
+        ResourceInterpreter resourceInterpreter = interpreterMap.get(resourceClass);
         if (resourceInterpreter == null) {
-            throw new IllegalArgumentException("No resource interpreter found for: " + finalClass);
+            throw new IllegalArgumentException("No resource interpreter found for: " + resourceClass);
         }
 
-        Object value = resourceInterpreter.buildResource(data, formattingScheme, context, this);
+        Object value =  resourceInterpreter.buildResource(
+                dataValue,
+                formattingScheme,
+                context,
+                this
+        );
+
         if (value == null) {
-            throw new IllegalArgumentException("Unable to build resource as: " + finalClass);
+            throw new IllegalArgumentException("Unable to build resource as: " + resourceClass);
         }
 
         return (List<T>) ((value instanceof List) ? ((List) value) : Collections.singletonList(value));
@@ -88,15 +104,23 @@ public class ResourceMapperImpl implements ResourceMapper {
 
         char pathSeparator = resourceReference.pathSeparator();
         String[] path = resourceReference.path().split(Pattern.quote(String.valueOf(pathSeparator)));
-        List<Map<String, Object>> data = translationDataProvider.findTranslationData(sourceName, path, pathSeparator);
+
+        ModelDataList data = translationDataProvider.findTranslationData(sourceName, path, pathSeparator);
+
         ResourceOptions options = resourceReference.createOptions();
         if (data != null && !data.isEmpty()) {
             List<T> results = new ArrayList<>();
             int i = 0;
 
-            for (Map<String, Object> dataMap : data) {
+            for (ModelDataValue dataMap : data) {
                 try {
-                    List<T> formatted = formatData(dataMap, options, resourceReference.formattingScheme(), context);
+                    List<T> formatted = formatData(
+                            dataMap,
+                            options,
+                            resourceReference.formattingScheme(),
+                            context
+                    );
+
                     results.addAll(formatted);
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to format data at index: " + i, e);

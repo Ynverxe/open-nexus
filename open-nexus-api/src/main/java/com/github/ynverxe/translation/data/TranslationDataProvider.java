@@ -1,11 +1,12 @@
 package com.github.ynverxe.translation.data;
 
+import com.github.ynverxe.structured.data.ModelDataList;
+import com.github.ynverxe.structured.data.ModelDataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@SuppressWarnings("unchecked, rawtypes")
 public class TranslationDataProvider {
 
     private final DataSource.Factory factory;
@@ -21,7 +22,11 @@ public class TranslationDataProvider {
         this.factory = factory;
     }
 
-    public @Nullable List<Map<String, Object>> findTranslationData(@NotNull String lang, @NotNull String[] path, char charSeparator) throws IllegalArgumentException {
+    public @Nullable ModelDataList findTranslationData(
+            @NotNull String lang,
+            @NotNull String[] path,
+            char charSeparator
+    ) throws IllegalArgumentException {
         DataSource dataSource = cachedSources.get(lang);
         if (dataSource == null) {
             if (factory == null) {
@@ -30,20 +35,18 @@ public class TranslationDataProvider {
             dataSource = factory.create(lang);
         }
 
-        Object found = dataSource.findData(path, charSeparator);
-        if (found instanceof List) {
-            return new ArrayList<>((List) found);
+        ModelDataValue found = dataSource.findData(path, charSeparator);
+
+        if (found == null) return null;
+
+        if (found.isList()) {
+            return found.asList();
         }
 
-        if (found instanceof Map) {
-            return Collections.singletonList((Map<String, Object>) found);
-        }
+        ModelDataList list = new ModelDataList();
+        list.add(found);
 
-        if (found == null) {
-            return null;
-        }
-
-        return Collections.singletonList(Collections.singletonMap("value", found));
+        return list;
     }
 
     public @NotNull TranslationDataProvider addSource(@NotNull String lang, @NotNull DataSource dataSource) {

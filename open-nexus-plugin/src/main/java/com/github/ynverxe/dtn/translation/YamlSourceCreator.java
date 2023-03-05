@@ -3,6 +3,7 @@ package com.github.ynverxe.dtn.translation;
 import java.io.InputStream;
 import java.io.IOException;
 
+import com.github.ynverxe.structured.data.ModelDataValue;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.ConfigurationSection;
@@ -46,8 +47,7 @@ public class YamlSourceCreator extends AbstractFileDataSourceFactory {
         }
 
         return new DataSource() {
-            @Nullable
-            public Object findData(@NotNull String[] path, char separatorChar) {
+            public @Nullable ModelDataValue findData(@NotNull String[] path, char separatorChar) {
                 String builtPath = this.buildPath(path, separatorChar);
                 if ("".equals(builtPath)) {
                     return null;
@@ -55,14 +55,14 @@ public class YamlSourceCreator extends AbstractFileDataSourceFactory {
 
                 Object found = yamlConfiguration.get(builtPath);
                 if (found instanceof ConfigurationSection) {
-                    return ((ConfigurationSection)found).getValues(true);
+                    found = ((ConfigurationSection)found).getValues(true);
                 }
 
                 if (found instanceof ConfigurationSerializable) {
-                    return ((ConfigurationSerializable)found).serialize();
+                    found = ((ConfigurationSerializable)found).serialize();
                 }
 
-                return found;
+                return ModelDataValue.ensureSafety(found);
             }
         };
     }
