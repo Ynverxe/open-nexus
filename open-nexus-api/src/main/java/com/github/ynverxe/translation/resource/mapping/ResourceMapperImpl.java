@@ -86,6 +86,9 @@ public class ResourceMapperImpl implements ResourceMapper {
 
     @NotNull @Override
     public <T> List<T> formatResource(@NotNull ResourceReference<T> resourceReference, @NotNull FormattingContext context) {
+        if (resourceReference.isEmpty())
+            throw new IllegalArgumentException("Empty reference");
+
         String sourceName = context.getSourceName();
         if (sourceName == null) {
             throw new IllegalArgumentException("No source name provided");
