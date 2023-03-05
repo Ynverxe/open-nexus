@@ -42,7 +42,7 @@ public interface ResourceReference<T> {
     }
 
     default boolean isEmpty() {
-        return optionalDefaultValue().isPresent() || !path().isEmpty();
+        return !optionalDefaultValue().isPresent() && path().isEmpty();
     }
 
     default @NotNull ResourceReference<T> replacing(@NotNull String key, @NotNull Function<FormattingContext, Object> valueSupplier) {
