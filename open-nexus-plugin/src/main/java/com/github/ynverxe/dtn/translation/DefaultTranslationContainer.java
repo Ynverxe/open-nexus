@@ -86,7 +86,7 @@ public final class DefaultTranslationContainer {
         NO_MAP_FOUND = ResourceReference.create(String.class, "no-map-found").withDefaultValue("No map found to start the game.");
         PLAYER_HIT_NEXUS = ResourceReference.create(String.class, "player-hit-nexus")
                 .withDefaultValue("<player> &7has damaged the <nexus>&7. &e<remainingHealth>");
-        YOUR_NEXUS_HAS_BEEN_DESTROYED = ResourceReference.onlyPath("title", "nexus-has-been-destroyed")
+        YOUR_NEXUS_HAS_BEEN_DESTROYED = ResourceReference.create("title", "nexus-has-been-destroyed")
                 .withDefaultValue(new Title("&cYour nexus", "&chas been destroyed"));
         GLOBAL_NEXUS_DEATH = ResourceReference.create(String.class, "nexus-death-message")
                 .withDefaultValue("<nexus> &7has been destroyed by <player>&7.");
@@ -96,7 +96,7 @@ public final class DefaultTranslationContainer {
         MATCH_WILL_END = ResourceReference.create(String.class, "match-will-end").withDefaultValue("&7» &aMatch will end in &6<time>&a.");
         TEAM_HAS_WON = ResourceReference.create(String.class, "team-has-won").withDefaultValue("&7» &bThe <team> &bhas &6won&b!");
         YOUR_TEAM_HAS_WON = ResourceReference.create(Title.class, "your-team-has-won").withDefaultValue(new Title("&6&lYour team has won!"));
-        FIRST_PHASE_MESSAGE = ResourceReference.onlyPath("string", "first-phase-start")
+        FIRST_PHASE_MESSAGE = ResourceReference.create("string", "first-phase-start")
                 .withDefaultValue(Arrays.asList(Arrays.asList(
                         "&8&m]----------[ &bPhase &a1 &8§&m]----------[",
                         "&7The &bgame &7starts! Get resources and equipment",
@@ -105,14 +105,14 @@ public final class DefaultTranslationContainer {
                         "&6invincible."),
                         new Title("&b&lPhase &a&l1", "&estarts!"))
                 );
-        SECOND_PHASE_MESSAGE = ResourceReference.onlyPath("string", "second-phase-start")
+        SECOND_PHASE_MESSAGE = ResourceReference.create("string", "second-phase-start")
                 .withDefaultValue(Arrays.asList(Arrays.asList(
                         "&8&m]----------[ &bPhase &e2 &8§&m]----------[",
                         "&7All nexus are vulnerable, protect your nexus from enemies",
                         "&7or show your courage hitting the enemies nexus."),
                         new Title("&b&lPhase &e&l1", "&estarts!"))
                 );
-        THIRD_PHASE_MESSAGE = ResourceReference.onlyPath("string", "third-phase-start")
+        THIRD_PHASE_MESSAGE = ResourceReference.create("string", "third-phase-start")
                 .withDefaultValue(Arrays.asList(Arrays.asList(
                         "&8&m]----------[ &bPhase &63 &8§&m]----------[",
                         "&7The most anticipated phase starts!",
@@ -120,14 +120,14 @@ public final class DefaultTranslationContainer {
                         "&7of the map."),
                         new Title("&b&lPhase &6&l3", "&estarts!"))
                 );
-        FOURTH_PHASE_MESSAGE = ResourceReference.onlyPath("string", "first-phase-start")
+        FOURTH_PHASE_MESSAGE = ResourceReference.create("string", "first-phase-start")
                 .withDefaultValue(Arrays.asList(Arrays.asList(
                         "&8&m]----------[ &bPhase &c4 &8§&m]----------[",
                         "&7The bravest who kills the &5boss &7will getValue",
                         "&7a very &6powerful &7item."),
                         new Title("&b&lPhase &a&l1", "&estarts!"))
                 );
-        FIFTH_PHASE_MESSAGE = ResourceReference.onlyPath("string", "fifth-phase-start")
+        FIFTH_PHASE_MESSAGE = ResourceReference.create("string", "fifth-phase-start")
                 .withDefaultValue(Arrays.asList(Arrays.asList(
                         "&8&m]----------[ &bPhase &c4 &8§&m]----------[",
                         "&7The definitive phase starts! Be careful",
