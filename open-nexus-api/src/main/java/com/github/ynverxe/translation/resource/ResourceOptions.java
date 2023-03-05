@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class ResourceOptions {
 
-    private final String typeName;
-    private final Class<?> type;
+    private final @NotNull String typeName;
+    private final @NotNull Class<?> type;
 
-    public ResourceOptions(String typeName, Class<?> type) {
+    public ResourceOptions(@NotNull String typeName, @NotNull Class<?> type) {
         this.typeName = typeName;
         this.type = type;
     }

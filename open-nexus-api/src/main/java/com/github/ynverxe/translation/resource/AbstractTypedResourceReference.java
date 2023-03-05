@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public class AbstractTypedResourceReference extends AbstractResourceReference<Object> {
-    private final String typeName;
+    private final @NotNull String typeName;
 
-    AbstractTypedResourceReference(FormattingScheme formattingScheme, String path, char pathSeparator, String dispatchMode, Supplier<Object> defaultValueSupplier, String typeName) {
+    AbstractTypedResourceReference(FormattingScheme formattingScheme, String path, char pathSeparator, String dispatchMode, Supplier<Object> defaultValueSupplier, @NotNull String typeName) {
         super(formattingScheme, path, pathSeparator, Object.class, dispatchMode, defaultValueSupplier);
         this.typeName = typeName;
     }
