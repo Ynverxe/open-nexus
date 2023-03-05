@@ -7,7 +7,7 @@ import com.github.ynverxe.translation.resource.ResourceReference;
 import org.jetbrains.annotations.NotNull;
 
 public interface FeatureHandler {
-    Authorization AUTHORIZED = new Authorization(ResourceReference.simple("all in order!"), true);
+    Authorization AUTHORIZED = new Authorization(ResourceReference.createWithAuxiliary("all in order!"), true);
 
     default @NotNull Authorization authorizeToStart(@NotNull GameInstance gameInstance, @NotNull Dimension selectedDimension) {
         return FeatureHandler.AUTHORIZED;

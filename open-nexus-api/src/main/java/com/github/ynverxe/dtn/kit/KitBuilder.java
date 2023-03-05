@@ -33,7 +33,7 @@ public final class KitBuilder {
         equipmentFactory = ((kit, matchPlayer) -> new Equipment());
         playerPreparer = ((kit, aPlayer) -> {
         });
-        kitDescriptionLore = ResourceReference.create(String.class, Collections::emptyList);
+        kitDescriptionLore = ResourceReference.createWithAuxiliary(String.class, Collections::emptyList);
         this.name = name;
         this.plugin = plugin;
         this.kitRegistry = kitRegistry;
