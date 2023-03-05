@@ -2,7 +2,7 @@ package com.github.ynverxe.translation.resource.mapping;
 
 import com.github.ynverxe.structured.data.ModelDataValue;
 import com.github.ynverxe.translation.data.TranslationDataProvider;
-import com.github.ynverxe.translation.resource.ResourceOptions;
+import com.github.ynverxe.translation.resource.ResourceTypeDescriptor;
 import com.github.ynverxe.translation.resource.ResourceReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +22,7 @@ public interface ResourceMapper {
 
     @NotNull <T> List<T> formatData(
             @NotNull ModelDataValue dataValue,
-            @NotNull ResourceOptions resourceOptions,
+            @NotNull ResourceTypeDescriptor resourceTypeDescriptor,
             @NotNull FormattingScheme formattingScheme,
             @NotNull FormattingContext formattingContext
     );
