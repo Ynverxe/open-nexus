@@ -63,7 +63,7 @@ public interface ResourceReference<T> {
                 new FormattingScheme(),
                 path,
                 pathSeparator,
-                new ResourceTypeDescriptor("", type),
+                new ResourceTypeDescriptor(type),
                 "default",
                 () -> null
         );
@@ -78,7 +78,7 @@ public interface ResourceReference<T> {
                 new FormattingScheme(),
                 path,
                 pathSeparator,
-                new ResourceTypeDescriptor(typeName, Object.class),
+                new ResourceTypeDescriptor(typeName),
                 "default",
                 () -> null
         );
