@@ -389,7 +389,6 @@ public class GameInstanceImpl extends AbstractTerminable implements GameInstance
     private static List<TeamColor> unbalancedTeams(int gamePlayers, Map<TeamColor, ? extends List<?>> teams) {
         List<TeamColor> unbalancedTeams = new ArrayList<>();
         int balance = gamePlayers / 4;
-        System.out.println(balance);
 
         teams.forEach((team, players) -> {
             int teamPlayerCount = players.size();

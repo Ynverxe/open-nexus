@@ -40,7 +40,6 @@ public class PlayerHandler implements EntityHandler<Player> {
             entity.sendMessage(message.toString());
         }
 
-        System.out.println(message);
         return true;
     }
     
