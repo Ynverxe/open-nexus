@@ -105,10 +105,10 @@ public class ResourceMapperImpl implements ResourceMapper {
             List<T> results = new ArrayList<>();
             int i = 0;
 
-            for (ModelDataValue dataMap : data) {
+            for (ModelDataValue dataValue : data) {
                 try {
                     List<T> formatted = formatData(
-                            dataMap,
+                            dataValue,
                             options,
                             resourceReference.formattingScheme(),
                             context
@@ -120,13 +120,15 @@ public class ResourceMapperImpl implements ResourceMapper {
                 }
                 ++i;
             }
+
             return results;
         }
 
-        List<T> def = (List<T>) consumeDefault((ResourceReference<Object>) resourceReference, context);
+        List<T> def = consumeDefault(resourceReference, context);
         if (def == null) {
             throw new IllegalArgumentException(String.format("No data found on source '%s' and no default resource value found using path '%s'", sourceName, resourceReference.path()));
         }
+
         return def;
     }
 
