@@ -67,7 +67,7 @@ public class MatchPlayerImpl extends DelegatedPlayerBase implements MatchPlayer 
     }
     
     public boolean isTeamAlive() {
-        return !this.team.isNexusAlive();
+        return team != null && !this.team.isNexusAlive();
     }
     
     public void joinTeam(@NotNull TeamColor teamColor) {
