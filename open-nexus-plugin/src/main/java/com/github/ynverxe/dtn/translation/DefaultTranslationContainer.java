@@ -40,7 +40,8 @@ public final class DefaultTranslationContainer {
     public static final ResourceReference<?> FOURTH_PHASE_MESSAGE;
     public static final ResourceReference<?> FIFTH_PHASE_MESSAGE;
     public static final ResourceReference<Title> MATCH_TIE;
-    
+    public static final ResourceReference<?> DISQUALIFIED_TEAM;
+
     static {
         INSUFFICIENT_PLAYERS = ResourceReference.create(String.class, "match-cannot-start.insufficient-players")
                 .withDefaultValue("&7» &cNot enough players in room to start");
@@ -134,7 +135,7 @@ public final class DefaultTranslationContainer {
                         "&7now the &dnexus &7damage are &cdouble&7."),
                         new Title("&b&lPhase &a&l1", "&estarts!"))
                 );
-        MATCH_TIE = ResourceReference.create(Title.class, "match-tie")
-                .withDefaultValue(new Title("&d&lTie!", "&eIt was a good game!"));
+        MATCH_TIE = ResourceReference.create(Title.class, "match-tie").withDefaultValue(new Title("&d&lTie!", "&eIt was a good game!"));
+        DISQUALIFIED_TEAM = ResourceReference.create("string", "disqualified-team").withDefaultValue("&cTeam is disqualidied.");
     }
 }

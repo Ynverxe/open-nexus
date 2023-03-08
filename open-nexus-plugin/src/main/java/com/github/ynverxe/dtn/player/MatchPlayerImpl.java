@@ -76,6 +76,10 @@ public class MatchPlayerImpl extends DelegatedPlayerBase implements MatchPlayer 
         }
 
         Team newTeam = this.match.teams().get(teamColor);
+
+        if (newTeam.disqualified())
+            throw new IllegalStateException(teamColor + " team is disqualified");
+
         newTeam.joinPlayer(this);
     }
     

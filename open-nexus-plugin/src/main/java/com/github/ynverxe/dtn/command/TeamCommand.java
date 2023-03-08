@@ -1,6 +1,8 @@
 package com.github.ynverxe.dtn.command;
 
 import com.github.ynverxe.dtn.game.GameInstance;
+import com.github.ynverxe.dtn.match.Match;
+import com.github.ynverxe.dtn.team.Team;
 import com.github.ynverxe.dtn.translation.DefaultTranslationContainer;
 import com.github.ynverxe.dtn.team.TeamColor;
 import com.github.ynverxe.dtn.annotation.CSender;
@@ -18,7 +20,19 @@ public class TeamCommand implements CommandClass {
             return true;
         }
 
+        Match match = game.runningMatch();
+
+        if (match != null) {
+            Team team = match.teams().get(color);
+
+            if (team.disqualified()) {
+                sender.renderResource(DefaultTranslationContainer.DISQUALIFIED_TEAM);
+                return true;
+            }
+        }
+
         game.teamSelector().bindTeamToPlayer(sender, color);
+
         sender.renderResource(DefaultTranslationContainer.TEAM_JOIN.replacing("<team>", color.coloredName()));
         return true;
     }
